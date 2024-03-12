@@ -31,4 +31,6 @@ public interface XTSAPIInteractiveEvents {
 
 	void onTradeConversion(TradeConversionResponse orderExecutionResponse);
 
+	void startAlert();
+
 }

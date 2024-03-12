@@ -24,7 +24,7 @@ import com.sf.xts.api.sdk.ConfigurationProvider;
 public class RequestHandler {
 
 	public static Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-	private HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(ConfigurationProvider.sslSocketFactory).build();
+	private HttpClient httpClient = HttpClientBuilder.create().build();
 	ObjectMapper objectMapper = new ObjectMapper();
 	
 	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname){

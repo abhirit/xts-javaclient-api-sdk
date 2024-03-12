@@ -56,28 +56,45 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 			options.transports=transportArray;
 			options.reconnection=true;
 			options.forceNew=true;
-			options.timeout=5000;
+			options.timeout=40000;
 			System.out.println("queryString==="+queryString);
 			System.out.println("url==="+url);
 			socket = IO.socket(url, options);
 			socket.on("connect", new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					logger.debug("on Connect");
+					if (args != null && args.length > 0) {
+						logger.info("on Connect "+args[0]);
+					}
+					else {
+						logger.info("on Connect");
+					}
 				}
 			});
 			
 			socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					logger.debug("handshake");
+					if (args != null && args.length > 0) {
+						logger.info("handshake "+args[0]);
+					}
+					else {
+						logger.info("handshake");
+					}
+
 				}
 			});
 
 			socket.on(Socket.EVENT_CONNECTING, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					logger.debug("connecting event");
+					if (args != null && args.length > 0) {
+						logger.info("connecting event "+args[0]);
+					}
+					else {
+						logger.info("connecting event");
+					}
+
 				}
 			});
 
@@ -86,10 +103,10 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 				public void call(Object... args) {
 
 					logger.info("**position_Report**");
-					Gson gson = new Gson();
-					PositionResponse response = gson.fromJson(args[0].toString(), PositionResponse.class);
-					onPosition(response);
-					// System.out.println("NetPosition:"+response.getNetPosition());
+//					Gson gson = new Gson();
+//					System.out.println("position_Report : "+args[0].toString());
+//					PositionResponse response = gson.fromJson(args[0].toString(), PositionResponse.class);
+//					onPosition(response);
 				}
 			});
 
@@ -99,7 +116,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 					logger.info("**got traded**");
 					Gson gson = new Gson();
 					OrderExecutionResponse response = gson.fromJson(args[0].toString(), OrderExecutionResponse.class);
-					// System.out.println("LastPrice:"+response.getLastTradedPrice());
+//					 System.out.println("got Traded:"+args[0].toString());
 					onTrade(response);
 				}
 			});
@@ -110,6 +127,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 					logger.info("**got tradeConversion**");
 					Gson gson = new Gson();
 					TradeConversionResponse response = gson.fromJson(args[0].toString(), TradeConversionResponse.class);
+//					System.out.println("trade conversion:"+args[0].toString());
 					onTradeConversion(response);
 				}
 			});
@@ -120,6 +138,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 					logger.info("**order placed**");
 					Gson gson = new Gson();
 					OrderBookResponse response = gson.fromJson(args[0].toString(), OrderBookResponse.class);
+//					System.out.println("order placed:"+args[0].toString());
 					onExecutionReport(response);
 					// System.out.println("  "+response.getOrderStatus());
 				}
@@ -129,6 +148,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 				@Override
 				public void call(Object... args) {
 					logger.error("closed!!!!!!!!!!"+ args[0]);
+					startAlert();
 				}
 			});
 			
@@ -153,6 +173,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 				@Override
 				public void call(Object... args) {
 					logger.error("error!!!!!!!!!!"+args[0]);
+					startAlert();
 				}
 			});
 
@@ -162,7 +183,110 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 					logger.info("Message!!!!!!!!!!"+args[0]);
 
 				}
-			}); 
+			});
+			socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Connect Error!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Connect Error!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Connect Timeout!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Connect Timeout!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_RECONNECT, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Reconnect!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Reconnect!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_RECONNECT_ERROR, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Reconnect Error!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Reconnect Error!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_RECONNECT_FAILED, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Reconnect failed!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Reconnect failed!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_RECONNECT_ATTEMPT, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.error("Reconnect attempt!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.error("Reconnect attempt!!!!!!!!!!");
+					}
+					startAlert();
+
+				}
+			});
+			socket.on(Socket.EVENT_PING, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.info("ping!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.info("ping!!!!!!!!!!");
+					}
+
+				}
+			});
+			socket.on(Socket.EVENT_PONG, new Emitter.Listener() {
+				@Override
+				public void call(Object... args) {
+					if (args != null && args.length > 0) {
+						logger.info("pong!!!!!!!!!! "+args[0]);
+					}
+					else {
+						logger.info("pong!!!!!!!!!!");
+					}
+
+				}
+			});
+
 
 			socket.connect();
 			Thread.sleep(2000);
@@ -204,4 +328,12 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 		for (XTSAPIInteractiveEvents hl : listeners)
 			hl.onTradeConversion(obj);
 	}
+
+	@Override
+	public void startAlert() {
+		for (XTSAPIInteractiveEvents hl : listeners)
+			hl.startAlert();
+	}
+
+
 }

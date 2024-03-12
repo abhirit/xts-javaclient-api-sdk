@@ -447,5 +447,11 @@ public class TestInteractive  implements XTSAPIInteractiveEvents {
 
 	}
 
+	@Override
+	public void startAlert() {
+		// TODO Auto-generated method stub
+
+	}
+
 	
 }
