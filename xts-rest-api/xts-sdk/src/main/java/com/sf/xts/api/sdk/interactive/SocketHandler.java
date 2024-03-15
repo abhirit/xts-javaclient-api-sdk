@@ -51,7 +51,7 @@ public class SocketHandler implements XTSAPIInteractiveEvents{
 			
 			IO.Options options = new IO.Options();
 			//make this configurable variable/property
-			options.path="/"+InteractiveClient.prefixINT+"/socket.io";
+			options.path="/socket.io";
 			options.query = queryString;
 			options.transports=transportArray;
 			options.reconnection=true;

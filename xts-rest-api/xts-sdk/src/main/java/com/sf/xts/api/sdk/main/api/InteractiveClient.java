@@ -54,6 +54,8 @@ public  class InteractiveClient extends ConfigurationProvider  {
 	Gson gson = new Gson();
 	private static SocketHandler sh=null;
 	public static String authToken = null;
+	public static String uniqueKey = null;
+	public static String connectionString = null;
 	public static String user = null;
 	public static boolean isInvestorClient = true;
 	public static String clientID = null;
@@ -82,13 +84,29 @@ public  class InteractiveClient extends ConfigurationProvider  {
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
+
+	public void hostLookup() throws APIException{
+		HttpPost request = new HttpPost("https://ttblaze.iifl.com:4000/HostLookUp");
+		request.addHeader("content-type", "application/json");
+		JSONObject data = new JSONObject();
+		data.put("accesspassword", "2021HostLookUpAccess");
+		data.put("version", "interactive_1.0.1");
+		String response = requestHandler.processPostHttpRequest(request,data,"HOSTlOOKUP");
+		JSONObject jsonObject = new JSONObject(response);
+		uniqueKey = (String) (((JSONObject) jsonObject.get("result")).get("uniqueKey"));
+		connectionString = (String) (((JSONObject) jsonObject.get("result")).get("connectionString"));
+	}
+
 	@SuppressWarnings("unchecked")
 	public String Login(String secretKey,String appKey) throws APIException{
-		HttpPost request = new HttpPost(interactiveURL + loginINT);
+		hostLookup();
+		if (uniqueKey == null || connectionString == null) return null;
+		HttpPost request = new HttpPost(connectionString + loginINT);
 		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
 		data.put("secretKey", secretKey);
 		data.put("appKey", appKey);
+		data.put("uniqueKey",uniqueKey);
 		data.put("source", source);
 		String response = requestHandler.processPostHttpRequest(request,data,"LOGIN");
 		JSONObject jsonObject = new JSONObject(response);
@@ -406,7 +424,7 @@ public  class InteractiveClient extends ConfigurationProvider  {
 	 */
 	public static boolean initializeListner(XTSAPIInteractiveEvents xtsapiInteractiveEvents) {
 		//Socket creating  for all the responses
-		sh = new SocketHandler(commonURL, user, authToken);
+		sh = new SocketHandler(connectionString, user, authToken);
 		sh.addListner(xtsapiInteractiveEvents);
 		return true;
 	}

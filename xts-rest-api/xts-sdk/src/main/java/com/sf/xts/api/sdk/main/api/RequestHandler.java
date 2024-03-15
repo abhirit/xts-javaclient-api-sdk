@@ -32,13 +32,11 @@ public class RequestHandler {
 		HttpResponse response = null;
 		String content = null;
 		try {
-			request.addHeader("content-type", "application/json");
 			request.setEntity( new StringEntity(data.toString())); 
 			if(request.getURI().toString().contains("marketdata") &&  MarketdataClient.authToken!=null)
 				request.addHeader("authorization", MarketdataClient.authToken);
 			else if(InteractiveClient.authToken!=null)
 				request.addHeader("authorization", InteractiveClient.authToken);
-			request.addHeader("content-type", "application/json");
 			response = httpClient.execute(request);
 			HttpEntity entity = new CheckResponse().check(response);
 			content = EntityUtils.toString(entity);
