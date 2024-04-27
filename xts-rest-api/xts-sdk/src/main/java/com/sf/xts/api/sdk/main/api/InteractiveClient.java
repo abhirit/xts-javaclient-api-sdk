@@ -86,7 +86,7 @@ public  class InteractiveClient extends ConfigurationProvider  {
 	 */
 
 	public void hostLookup() throws APIException{
-		HttpPost request = new HttpPost("https://ttblaze.iifl.com:4000/HostLookUp");
+		HttpPost request = new HttpPost("https://blazemum.indiainfoline.com:4000/HostLookUp");
 		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
 		data.put("accesspassword", "2021HostLookUpAccess");
